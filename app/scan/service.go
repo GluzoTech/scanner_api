@@ -32,9 +32,11 @@ func (s *Service) CreateScan(
 
 	return s.repository.Create(
 		ctx,
+		request.EventID,
 		request.DeviceID,
 		request.VendorID,
 		request.ProductID,
+		request.AgentHost,
 		request.BarcodeInput,
 		timestamp,
 	)
