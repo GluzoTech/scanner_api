@@ -73,3 +73,62 @@ func (r *Repository) Create(
 
 	return nil
 }
+
+// FindByBarcode returns every scan captured for a barcode value. The barcode is
+// what the UI calls an order id, and it is not unique in the table, so a
+// re-scanned order yields one row per capture, newest first.
+func (r *Repository) FindByBarcode(
+	ctx context.Context,
+	barcodeInput string,
+) ([]ScanDetail, error) {
+	query := `
+	SELECT
+	id,
+	event_id,
+	device_id,
+	vendor_id,
+	product_id,
+	agent_host,
+	barcode_input,
+	TO_CHAR(created_at, 'YYYY-MM-DD'),
+	TO_CHAR(captured_at, 'HH24:MI:SS')
+	FROM scans
+	WHERE barcode_input = $1
+	ORDER BY created_at DESC, captured_at DESC, id DESC
+	`
+
+	rows, err := r.db.QueryContext(ctx, query, barcodeInput)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch scans: %w", err)
+	}
+
+	defer rows.Close()
+
+	scans := []ScanDetail{}
+
+	for rows.Next() {
+		var scan ScanDetail
+
+		if err := rows.Scan(
+			&scan.ID,
+			&scan.EventID,
+			&scan.DeviceID,
+			&scan.VendorID,
+			&scan.ProductID,
+			&scan.AgentHost,
+			&scan.BarcodeInput,
+			&scan.CreatedAt,
+			&scan.CapturedAt,
+		); err != nil {
+			return nil, fmt.Errorf("failed to read scan: %w", err)
+		}
+
+		scans = append(scans, scan)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("failed to read scans: %w", err)
+	}
+
+	return scans, nil
+}

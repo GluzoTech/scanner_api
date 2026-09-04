@@ -41,6 +41,10 @@ func main() {
 
 	router := gin.Default()
 
+	// Server rendered views live in templates/, read relative to the working
+	// directory the same way migrations/ is.
+	router.LoadHTMLGlob("templates/*.html")
+
 	router.GET("health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"status": "ok",
@@ -51,6 +55,9 @@ func main() {
 	api := router.Group("/api")
 
 	scan.RegisterRoutes(api, scanHandler)
+
+	// Page routes
+	scan.RegisterPageRoutes(router, scanHandler)
 
 	log.Println("Scanner API running on :8000")
 

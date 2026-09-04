@@ -3,6 +3,7 @@ package scan
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -40,4 +41,20 @@ func (s *Service) CreateScan(
 		request.BarcodeInput,
 		timestamp,
 	)
+}
+
+// FindByOrderID looks a scan up by the value the scanner captured. "Order id"
+// is the label the page view puts on it; in storage it is barcode_input.
+func (s *Service) FindByOrderID(
+	ctx context.Context,
+	orderID string,
+) ([]ScanDetail, error) {
+
+	orderID = strings.TrimSpace(orderID)
+
+	if orderID == "" {
+		return nil, fmt.Errorf("order id is required")
+	}
+
+	return s.repository.FindByBarcode(ctx, orderID)
 }

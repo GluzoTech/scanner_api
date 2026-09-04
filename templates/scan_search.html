@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scan Lookup</title>
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --card: #ffffff;
+    --border: #e2e5ea;
+    --text: #1c1f24;
+    --muted: #6b7280;
+    --accent: #1f6feb;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 40px 20px;
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+
+  .wrap { max-width: 860px; margin: 0 auto; }
+
+  h1 { font-size: 22px; margin: 0 0 4px; }
+
+  .subtitle { color: var(--muted); margin: 0 0 24px; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .field { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  input[type="text"] {
+    flex: 1 1 260px;
+    padding: 10px 12px;
+    font-size: 15px;
+    color: var(--text);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  input[type="text"]:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: -1px;
+  }
+
+  button {
+    padding: 10px 20px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    background: var(--accent);
+    border: 0;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .note { color: var(--muted); margin: 0; }
+
+  .error { color: #b42318; margin: 0; }
+
+  .result-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .result-head h2 { font-size: 16px; margin: 0; }
+
+  .count { color: var(--muted); font-size: 13px; }
+
+  .table-scroll { overflow-x: auto; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+
+  th, td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  th {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--muted);
+  }
+
+  tbody tr:last-child td { border-bottom: 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Scan Lookup</h1>
+  <p class="subtitle">Find every capture recorded for an order.</p>
+
+  <form class="card" method="get" action="/scans">
+    <label for="order_id">Search by Order ID</label>
+    <div class="field">
+      <input
+        type="text"
+        id="order_id"
+        name="order_id"
+        value="{{ .OrderID }}"
+        placeholder="Scan or type the order id"
+        autocomplete="off"
+        autofocus>
+      <button type="submit">Search</button>
+    </div>
+  </form>
+
+  {{ if .Error }}
+    <div class="card"><p class="error">{{ .Error }}</p></div>
+  {{ else if .Searched }}
+    {{ if .Scans }}
+      <div class="card">
+        <div class="result-head">
+          <h2>Results for {{ .OrderID }}</h2>
+          <span class="count">{{ len .Scans }} scan(s)</span>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Time (IST)</th>
+                <th>Device</th>
+                <th>Vendor</th>
+                <th>Product</th>
+                <th>Agent host</th>
+                <th>Event ID</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{ range .Scans }}
+                <tr>
+                  <td>{{ .CreatedAt }}</td>
+                  <td>{{ .CapturedAt }}</td>
+                  <td>{{ .DeviceID }}</td>
+                  <td>{{ .VendorID }}</td>
+                  <td>{{ .ProductID }}</td>
+                  <td>{{ .AgentHost }}</td>
+                  <td>{{ .EventID }}</td>
+                </tr>
+              {{ end }}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {{ else }}
+      <div class="card">
+        <p class="note">No scans found for <strong>{{ .OrderID }}</strong>.</p>
+      </div>
+    {{ end }}
+  {{ end }}
+
+</div>
+</body>
+</html>
