@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 
+	"scanner-api/app/scan"
 	"scanner-api/database"
 )
 
@@ -29,6 +30,15 @@ func main() {
 
 	log.Println("Database migrations completed")
 
+	// Repository
+	scanRepository := scan.NewRepository(db)
+
+	// Service
+	scanService := scan.NewService(scanRepository)
+
+	// Handler
+	scanHandler := scan.NewHandler(scanService)
+
 	router := gin.Default()
 
 	router.GET("health", func(c *gin.Context) {
@@ -36,6 +46,11 @@ func main() {
 			"status": "ok",
 		})
 	})
+
+	// API routes
+	api := router.Group("/api")
+
+	scan.RegisterRoutes(api, scanHandler)
 
 	log.Println("Scanner API running on :8000")
 
