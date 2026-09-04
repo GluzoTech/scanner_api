@@ -1,4 +1,4 @@
-CREATE TABLE scans (
+CREATE TABLE IF NOT EXISTS scans (
     id BIGSERIAL PRIMARY KEY,
     device_id VARCHAR(255) NOT NULL,
     barcode_input TEXT NOT NULL,

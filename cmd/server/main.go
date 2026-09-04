@@ -23,6 +23,12 @@ func main() {
 
 	defer db.Close()
 
+	if err := database.RunMigrations(db); err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("Database migrations completed")
+
 	router := gin.Default()
 
 	router.GET("health", func(c *gin.Context) {
