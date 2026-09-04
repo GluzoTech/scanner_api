@@ -107,6 +107,8 @@
   }
 
   tbody tr:last-child td { border-bottom: 0; }
+
+  .unmapped { color: var(--muted); }
 </style>
 </head>
 <body>
@@ -146,6 +148,7 @@
                 <th>Date</th>
                 <th>Time (IST)</th>
                 <th>Device</th>
+                <th>Camera</th>
                 <th>Vendor</th>
                 <th>Product</th>
                 <th>Agent host</th>
@@ -158,6 +161,7 @@
                   <td>{{ .CreatedAt }}</td>
                   <td>{{ .CapturedAt }}</td>
                   <td>{{ .DeviceID }}</td>
+                  <td>{{ if .Camera }}{{ .Camera }}{{ else }}<span class="unmapped">&mdash;</span>{{ end }}</td>
                   <td>{{ .VendorID }}</td>
                   <td>{{ .ProductID }}</td>
                   <td>{{ .AgentHost }}</td>

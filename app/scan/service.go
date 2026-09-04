@@ -56,5 +56,16 @@ func (s *Service) FindByOrderID(
 		return nil, fmt.Errorf("order id is required")
 	}
 
-	return s.repository.FindByBarcode(ctx, orderID)
+	scans, err := s.repository.FindByBarcode(ctx, orderID)
+	if err != nil {
+		return nil, err
+	}
+
+	// The camera a scan came from is not stored with the row; it is derived
+	// from the device that captured it.
+	for i := range scans {
+		scans[i].Camera = CameraForDevice(scans[i].DeviceID)
+	}
+
+	return scans, nil
 }

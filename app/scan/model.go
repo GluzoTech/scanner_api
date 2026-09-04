@@ -31,6 +31,7 @@ type ScanDetail struct {
 	ID           int64  `json:"id"`
 	EventID      string `json:"event_id"`
 	DeviceID     string `json:"device_id"`
+	Camera       string `json:"camera"`
 	VendorID     string `json:"vendor_id"`
 	ProductID    string `json:"product_id"`
 	AgentHost    string `json:"agent_host"`
