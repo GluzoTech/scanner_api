@@ -8,6 +8,7 @@ import (
 	"github.com/joho/godotenv"
 
 	"scanner-api/app/scan"
+	"scanner-api/app/scanevent"
 	"scanner-api/database"
 )
 
@@ -32,12 +33,15 @@ func main() {
 
 	// Repository
 	scanRepository := scan.NewRepository(db)
+	scanEventRepository := scanevent.NewRepository(db)
 
 	// Service
 	scanService := scan.NewService(scanRepository)
+	scanEventService := scanevent.NewService(scanEventRepository)
 
 	// Handler
 	scanHandler := scan.NewHandler(scanService)
+	scanEventHandler := scanevent.NewHandler(scanEventService)
 
 	router := gin.Default()
 
@@ -55,6 +59,10 @@ func main() {
 	api := router.Group("/api")
 
 	scan.RegisterRoutes(api, scanHandler)
+
+	// Web scanner routes, mounted on the api group so the endpoint is
+	// /api/scan/event, which is what the deployed scanner posts to.
+	scanevent.RegisterRoutes(api, scanEventHandler)
 
 	// Page routes
 	scan.RegisterPageRoutes(router, scanHandler)
